@@ -1464,14 +1464,25 @@
           updateTeacherCharts();
         });
         el("speakBtn").addEventListener("click", () => {
-          const msg = `Welcome to STEM Quest. Select an avatar and play to earn experience points.`;
+          const selectedLang = el("langSelect").value;
+          const msg =
+            selectedLang === "hi"
+              ? "स्टेम क्वेस्ट में आपका स्वागत है। एक अवतार चुनें और अनुभव अंक अर्जित करने के लिए खेलें।"
+              : "Welcome to STEM Quest. Select an avatar and play to earn experience points.";
+          const langCode = selectedLang === "hi" ? "hi-IN" : "en-US";
+
           try {
-            const u = new SpeechSynthesisUtterance(msg);
-            u.lang = "en-US";
-            speechSynthesis.cancel();
-            speechSynthesis.speak(u);
+            if ("speechSynthesis" in window) {
+              const u = new SpeechSynthesisUtterance(msg);
+              u.lang = langCode;
+              speechSynthesis.cancel(); // Cancel any previous speech
+              speechSynthesis.speak(u);
+            } else {
+              notify("Speech synthesis is not supported in your browser.");
+            }
           } catch (e) {
-            console.warn(e);
+            console.warn("Speech synthesis error:", e);
+            notify("Could not play audio.");
           }
         });
 
